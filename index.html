@@ -4,318 +4,248 @@
 <meta charset="UTF-8">
 <title>Acharya</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f0f2f5;
-}
-
-header {
-  background: #1e40af;
-  color: white;
-  padding: 16px;
-  text-align: center;
-  font-size: 26px;
-  font-weight: bold;
-}
-
-nav {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  background: white;
-  padding: 10px;
-}
-
-nav button {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #e5e7eb;
-  font-weight: 600;
-}
-
-nav button.active {
-  background: #1e40af;
-  color: white;
-}
-
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-select, input, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-}
-
-.upload-btn {
-  background: #1e40af;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.feed-item {
-  margin-top: 20px;
-}
-
-.feed-title {
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
-.feed-item img {
-  width: 100%;
-  border-radius: 10px;
-  pointer-events: none;
-  user-select: none;
-}
+body { background:#f1f5f9 }
+img { pointer-events:none }
 </style>
 </head>
+<body>
 
-<body oncontextmenu="return false">
+<!-- LOGIN -->
+<div id="loginPage" class="min-h-screen flex flex-col items-center justify-center gap-4">
+  <h1 class="text-3xl font-bold text-purple-600">Acharya</h1>
 
-<header>Acharya</header>
+  <button onclick="login('teacher')" class="bg-green-600 text-white px-6 py-2 rounded">
+    Teacher Login
+  </button>
 
-<nav> 
-  <button id="feedBtn" onclick="showTab('feed')">📰 Feed</button>
-  <button id="papersBtn" class="active" onclick="showTab('papers')">📚 Question Papers</button>
-  <button id="materialsBtn" onclick="showTab('materials')">📖 Materials</button>
+  <button onclick="login('student')" class="bg-blue-600 text-white px-6 py-2 rounded">
+    Student Login
+  </button>
 
-</nav>
+  <button onclick="login('guest')" class="bg-gray-600 text-white px-6 py-2 rounded">
+    Skip & Browse
+  </button>
 
-<div class="container">
-
-<!-- ADMIN -->
-<div id="admin" class="card" style="display:none;">
-  <h3>Admin Login</h3>
-  <input type="password" id="adminPassword" placeholder="Enter admin password">
-  <button class="upload-btn" onclick="adminLogin()">Unlock Admin</button>
-  <p id="adminMsg"></p>
-
-  <div id="adminPanel" style="display:none;">
-    <hr>
-    <h3>Upload Content (Images Only)</h3>
-
-    <input type="text" id="uploadTitle" placeholder="Enter Title (Required)">
-
-    <select id="uploadType">
-      <option value="papers">Question Papers</option>
-      <option value="materials">Materials</option>
-    </select>
-
-    <select id="uploadCourse">
-      <option value="">Select Course</option>
-      <option>MBA</option>
-      <option>B.Tech</option>
-      <option>BBA</option>
-      <option>Degree</option>
-    </select>
-
-    <select id="uploadYear">
-      <option value="">Select Year (Papers only)</option>
-      <option>2025</option>
-      <option>2024</option>
-      <option>2023</option>
-      <option>2022</option>
-    </select>
-
-    <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp">
-    <button class="upload-btn" onclick="uploadImage()">Upload Image</button>
-    <p id="uploadMsg"></p>
-  </div>
+  <p class="text-xs text-gray-400">Admin is hidden 🔒</p>
 </div>
 
+<!-- MAIN -->
+<div id="mainSite" class="hidden">
+
+<nav class="bg-white shadow p-4 flex justify-between">
+  <h2 class="font-bold text-purple-600">Acharya</h2>
+
+  <div class="flex gap-2">
+    <button onclick="showTab('feed')" class="tabBtn">Feed</button>
+    <button onclick="showTab('papers')" class="tabBtn">Question Papers</button>
+    <button onclick="showTab('materials')" class="tabBtn">Materials</button>
+    <button id="adminTab" onclick="showTab('admin')"
+      class="tabBtn bg-purple-600 text-white hidden">Admin</button>
+    <button onclick="logout()" class="tabBtn bg-red-500 text-white">Logout</button>
+  </div>
+</nav>
+
+<div class="p-6 max-w-5xl mx-auto">
+
 <!-- FEED -->
-<div id="feed" class="card" style="display:none;">
-  <h3>Latest Feed</h3>
-  <div id="feedContent"></div>
+<div id="feed" class="tab">
+  <h3 class="text-xl font-bold mb-4">Feed</h3>
+
+  <div id="teacherPost" class="hidden mb-3">
+    <textarea id="feedText" class="border p-2 w-full mb-2"
+      placeholder="Write update..."></textarea>
+    <button onclick="postFeed()" class="bg-green-600 text-white px-4 py-2 rounded">
+      Post
+    </button>
+  </div>
+
+  <div id="feedPosts" class="space-y-2"></div>
 </div>
 
 <!-- PAPERS -->
-<div id="papers" class="card">
-  <h3>Question Papers</h3>
+<div id="papers" class="tab hidden">
+  <h3 class="text-xl font-bold mb-3">Question Papers</h3>
 
-  <select id="paperCourse" onchange="filterPapers()">
+  <select id="paperCourse" class="border p-2 mb-2 w-full" onchange="filterPapers()">
     <option value="">Select Course</option>
     <option>MBA</option>
     <option>B.Tech</option>
-    <option>BBA</option>
     <option>Degree</option>
   </select>
 
-  <select id="paperYear" onchange="filterPapers()">
+  <select id="paperYear" class="border p-2 mb-3 w-full" onchange="filterPapers()">
     <option value="">Select Year</option>
     <option>2025</option>
     <option>2024</option>
     <option>2023</option>
-    <option>2022</option>
   </select>
 
-  <div id="papersFeed"></div>
+  <div id="paperList" class="grid grid-cols-2 gap-4"></div>
 </div>
 
 <!-- MATERIALS -->
-<div id="materials" class="card" style="display:none;">
-  <h3>Materials</h3>
+<div id="materials" class="tab hidden">
+  <h3 class="text-xl font-bold mb-3">Materials</h3>
 
-  <select id="materialCourse" onchange="filterMaterials()">
+  <select id="materialCourse" class="border p-2 mb-3 w-full" onchange="filterMaterials()">
     <option value="">Select Course</option>
     <option>MBA</option>
     <option>B.Tech</option>
-    <option>BBA</option>
     <option>Degree</option>
   </select>
 
-  <div id="materialsFeed"></div>
+  <div id="materialList" class="grid grid-cols-2 gap-4"></div>
 </div>
 
+<!-- ADMIN -->
+<div id="admin" class="tab hidden">
+  <h3 class="text-xl font-bold mb-4">Admin Upload</h3>
+
+  <select id="uploadType" class="border p-2 w-full mb-2">
+    <option value="paper">Question Paper</option>
+    <option value="material">Material</option>
+  </select>
+
+  <input id="title" class="border p-2 w-full mb-2" placeholder="Title">
+
+  <select id="course" class="border p-2 w-full mb-2">
+    <option>MBA</option>
+    <option>B.Tech</option>
+    <option>Degree</option>
+  </select>
+
+  <select id="year" class="border p-2 w-full mb-2">
+    <option>2025</option>
+    <option>2024</option>
+    <option>2023</option>
+  </select>
+
+  <input type="file" id="image" accept="image/*"
+    class="border p-2 w-full mb-3">
+
+  <button onclick="upload()"
+    class="bg-purple-600 text-white px-4 py-2 rounded">
+    Upload Image
+  </button>
+</div>
+
+</div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLogin"
+ class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="bg-white p-6 rounded w-80">
+    <h3 class="font-bold mb-3">Admin Login</h3>
+    <input id="adminPass" type="password" class="border p-2 w-full mb-3">
+    <button onclick="checkAdmin()"
+      class="bg-purple-600 text-white w-full py-2 rounded">
+      Login
+    </button>
+  </div>
 </div>
 
 <script>
-const ADMIN_PASSWORD = "acharya123";
+let currentUser = "guest";
+const ADMIN_PASS = "acharya123";
+let papers = [], materials = [];
 
-let papers = [];
-let materials = [];
-let isAdmin = false;
+function login(role){
+  currentUser = role;
+  loginPage.classList.add("hidden");
+  mainSite.classList.remove("hidden");
+  if(role==="teacher") teacherPost.classList.remove("hidden");
+}
+function logout(){ location.reload(); }
 
-function showTab(tab) {
-  ["feed","papers","materials","admin"].forEach(t => {
-    const el = document.getElementById(t);
-    if (el) el.style.display = t === tab ? "block" : "none";
-
-    const btn = document.getElementById(t + "Btn");
-    if (btn) btn.classList.toggle("active", t === tab);
-  });
+function showTab(id){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
 }
 
-function adminLogin() {
-  if (adminPassword.value === ADMIN_PASSWORD) {
-    isAdmin = true;
-    adminPanel.style.display = "block";
-    adminMsg.innerText = "✅ Admin unlocked";
-  } else {
-    adminMsg.innerText = "❌ Wrong password";
-  }
+function postFeed(){
+  if(currentUser!=="teacher")return;
+  const d=document.createElement("div");
+  d.className="bg-white p-3 rounded shadow";
+  d.innerText="👨‍🏫 "+feedText.value;
+  feedPosts.prepend(d);
+  feedText.value="";
 }
 
-function uploadImage() {
-  if (!isAdmin) return;
+function upload(){
+  if(currentUser!=="admin")return;
 
-  const title = uploadTitle.value.trim();
-  const file = imageInput.files[0];
-
-  if (!title) {
-    uploadMsg.innerText = "❌ Title is required";
+  const img=image.files[0];
+  if(!img || !img.type.startsWith("image/")){
+    alert("Only images allowed");
     return;
   }
 
-  if (!file || !file.type.startsWith("image/")) {
-    uploadMsg.innerText = "❌ Select a valid image";
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    const data = {
-      title,
-      course: uploadCourse.value,
-      year: uploadYear.value,
-      img: reader.result
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const item={
+      title:title.value,
+      course:course.value,
+      year:year.value,
+      img:e.target.result
     };
 
-    if (uploadType.value === "papers") {
-      papers.push(data);
-      filterPapers();
-    } else {
-      materials.push(data);
-      filterMaterials();
+    if(uploadType.value==="paper"){
+      papers.push(item); filterPapers();
+    }else{
+      materials.push(item); filterMaterials();
     }
-
-    uploadMsg.innerText = "✅ Uploaded successfully";
-    uploadTitle.value = "";
-    imageInput.value = "";
-     renderFeed();
   };
-
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(img);
 }
 
-function filterPapers() {
-  papersFeed.innerHTML = "";
-  papers
-    .filter(p => (!paperCourse.value || p.course === paperCourse.value) &&
-                 (!paperYear.value || p.year === paperYear.value))
-    .forEach(p => {
-      papersFeed.innerHTML += `
-        <div class="feed-item">
-          <div class="feed-title">${p.title}</div>
-          <img src="${p.img}">
-        </div>
-      `;
-    });
+function render(list,container){
+  container.innerHTML="";
+  list.forEach(i=>{
+    container.innerHTML+=`
+      <div class="bg-white p-2 rounded shadow">
+        <img src="${i.img}" class="w-full h-40 object-cover rounded mb-2">
+        <p class="font-semibold">${i.title}</p>
+      </div>`;
+  });
 }
 
-function filterMaterials() {
-  materialsFeed.innerHTML = "";
-  materials
-    .filter(m => !materialCourse.value || m.course === materialCourse.value)
-    .forEach(m => {
-      materialsFeed.innerHTML += `
-        <div class="feed-item">
-          <div class="feed-title">${m.title}</div>
-          <img src="${m.img}">
-        </div>
-      `;
-    });
+function filterPapers(){
+  render(
+    papers.filter(p=>
+      (!paperCourse.value||p.course===paperCourse.value)&&
+      (!paperYear.value||p.year===paperYear.value)
+    ),
+    paperList
+  );
 }
-// Secret shortcut: Ctrl + Shift + A
-document.addEventListener("keydown", function (e) {
-  if (e.ctrlKey && e.shiftKey && e.key === "A") {
-    showAdminSecret();
+function filterMaterials(){
+  render(
+    materials.filter(m=>
+      !materialCourse.value||m.course===materialCourse.value
+    ),
+    materialList
+  );
+}
+
+function checkAdmin(){
+  if(adminPass.value===ADMIN_PASS){
+    currentUser="admin";
+    adminTab.classList.remove("hidden");
+    adminLogin.classList.add("hidden");
+    alert("Admin Access Granted");
+  }else alert("Wrong password");
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.ctrlKey&&e.shiftKey&&e.key==="A"){
+    adminLogin.classList.remove("hidden");
   }
 });
-
-function showAdminSecret() {
-  document.getElementById("admin").style.display = "block";
-  document.getElementById("papers").style.display = "none";
-  document.getElementById("materials").style.display = "none";
-}
-function renderFeed() {
-  const feed = document.getElementById("feedContent");
-  feed.innerHTML = "";
-
-  const allItems = [...papers, ...materials];
-
-  allItems.reverse().forEach(item => {
-    feed.innerHTML += `
-      <div class="feed-item">
-        <div class="feed-title">${item.title}</div>
-        <img src="${item.img}">
-      </div>
-    `;
-  });
-} 
-showTab("feed");
-
-
 </script>
 
 </body>
 </html>
-
