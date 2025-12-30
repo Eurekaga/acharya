@@ -11,9 +11,10 @@ body { background:#f1f5f9 }
 img { pointer-events:none }
 </style>
 </head>
+
 <body>
 
-<!-- LOGIN -->
+<!-- LOGIN PAGE -->
 <div id="loginPage" class="min-h-screen flex flex-col items-center justify-center gap-4">
   <h1 class="text-3xl font-bold text-purple-600">Acharya</h1>
 
@@ -32,7 +33,7 @@ img { pointer-events:none }
   <p class="text-xs text-gray-400">Admin is hidden 🔒</p>
 </div>
 
-<!-- MAIN -->
+<!-- MAIN SITE -->
 <div id="mainSite" class="hidden">
 
 <nav class="bg-white shadow p-4 flex justify-between">
@@ -42,24 +43,22 @@ img { pointer-events:none }
     <button onclick="showTab('feed')" class="tabBtn">Feed</button>
     <button onclick="showTab('papers')" class="tabBtn">Question Papers</button>
     <button onclick="showTab('materials')" class="tabBtn">Materials</button>
-    <button id="adminTab" onclick="showTab('admin')"
-      class="tabBtn bg-purple-600 text-white hidden">Admin</button>
+    <button id="adminTab" onclick="showTab('admin')" class="tabBtn bg-purple-600 text-white hidden">
+      Admin
+    </button>
     <button onclick="logout()" class="tabBtn bg-red-500 text-white">Logout</button>
   </div>
 </nav>
 
-<div class="p-6 max-w-5xl mx-auto">
+<div class="p-6 max-w-6xl mx-auto">
 
 <!-- FEED -->
 <div id="feed" class="tab">
   <h3 class="text-xl font-bold mb-4">Feed</h3>
 
   <div id="teacherPost" class="hidden mb-3">
-    <textarea id="feedText" class="border p-2 w-full mb-2"
-      placeholder="Write update..."></textarea>
-    <button onclick="postFeed()" class="bg-green-600 text-white px-4 py-2 rounded">
-      Post
-    </button>
+    <textarea id="feedText" class="border p-2 w-full mb-2" placeholder="Write update..."></textarea>
+    <button onclick="postFeed()" class="bg-green-600 text-white px-4 py-2 rounded">Post</button>
   </div>
 
   <div id="feedPosts" class="space-y-2"></div>
@@ -76,11 +75,17 @@ img { pointer-events:none }
     <option>Degree</option>
   </select>
 
-  <select id="paperYear" class="border p-2 mb-3 w-full" onchange="filterPapers()">
+  <select id="paperYear" class="border p-2 mb-2 w-full" onchange="filterPapers()">
     <option value="">Select Year</option>
     <option>2025</option>
     <option>2024</option>
     <option>2023</option>
+  </select>
+
+  <select id="paperSemester" class="border p-2 mb-4 w-full" onchange="filterPapers()">
+    <option value="">Select Semester</option>
+    <option>1</option><option>2</option><option>3</option><option>4</option>
+    <option>5</option><option>6</option><option>7</option><option>8</option>
   </select>
 
   <div id="paperList" class="grid grid-cols-2 gap-4"></div>
@@ -90,11 +95,17 @@ img { pointer-events:none }
 <div id="materials" class="tab hidden">
   <h3 class="text-xl font-bold mb-3">Materials</h3>
 
-  <select id="materialCourse" class="border p-2 mb-3 w-full" onchange="filterMaterials()">
+  <select id="materialCourse" class="border p-2 mb-2 w-full" onchange="filterMaterials()">
     <option value="">Select Course</option>
     <option>MBA</option>
     <option>B.Tech</option>
     <option>Degree</option>
+  </select>
+
+  <select id="materialSemester" class="border p-2 mb-4 w-full" onchange="filterMaterials()">
+    <option value="">Select Semester</option>
+    <option>1</option><option>2</option><option>3</option><option>4</option>
+    <option>5</option><option>6</option><option>7</option><option>8</option>
   </select>
 
   <div id="materialList" class="grid grid-cols-2 gap-4"></div>
@@ -109,26 +120,32 @@ img { pointer-events:none }
     <option value="material">Material</option>
   </select>
 
-  <input id="title" class="border p-2 w-full mb-2" placeholder="Title">
+  <input id="titleInput" class="border p-2 w-full mb-2" placeholder="Title">
 
-  <select id="course" class="border p-2 w-full mb-2">
+  <select id="courseSelect" class="border p-2 w-full mb-2">
+    <option value="">Select Course</option>
     <option>MBA</option>
     <option>B.Tech</option>
     <option>Degree</option>
   </select>
 
-  <select id="year" class="border p-2 w-full mb-2">
+  <select id="yearSelect" class="border p-2 w-full mb-2">
+    <option value="">Select Year (Papers)</option>
     <option>2025</option>
     <option>2024</option>
     <option>2023</option>
   </select>
 
-  <input type="file" id="image" accept="image/*"
-    class="border p-2 w-full mb-3">
+  <select id="semesterSelect" class="border p-2 w-full mb-2">
+    <option value="">Select Semester</option>
+    <option>1</option><option>2</option><option>3</option><option>4</option>
+    <option>5</option><option>6</option><option>7</option><option>8</option>
+  </select>
 
-  <button onclick="upload()"
-    class="bg-purple-600 text-white px-4 py-2 rounded">
-    Upload Image
+  <input id="imageInput" type="file" accept="image/*" class="mb-3">
+
+  <button onclick="uploadContent()" class="px-4 py-2 bg-purple-600 text-white rounded">
+    Upload
   </button>
 </div>
 
@@ -136,13 +153,11 @@ img { pointer-events:none }
 </div>
 
 <!-- ADMIN LOGIN -->
-<div id="adminLogin"
- class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+<div id="adminLogin" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
   <div class="bg-white p-6 rounded w-80">
     <h3 class="font-bold mb-3">Admin Login</h3>
     <input id="adminPass" type="password" class="border p-2 w-full mb-3">
-    <button onclick="checkAdmin()"
-      class="bg-purple-600 text-white w-full py-2 rounded">
+    <button onclick="checkAdmin()" class="bg-purple-600 text-white w-full py-2 rounded">
       Login
     </button>
   </div>
@@ -151,8 +166,11 @@ img { pointer-events:none }
 <script>
 let currentUser = "guest";
 const ADMIN_PASS = "acharya123";
-let papers = [], materials = [];
 
+let papers = [];
+let materials = [];
+
+/* AUTH */
 function login(role){
   currentUser = role;
   loginPage.classList.add("hidden");
@@ -161,13 +179,15 @@ function login(role){
 }
 function logout(){ location.reload(); }
 
+/* TABS */
 function showTab(id){
   document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 }
 
+/* FEED */
 function postFeed(){
-  if(currentUser!=="teacher")return;
+  if(currentUser!=="teacher") return;
   const d=document.createElement("div");
   d.className="bg-white p-3 rounded shadow";
   d.innerText="👨‍🏫 "+feedText.value;
@@ -175,49 +195,62 @@ function postFeed(){
   feedText.value="";
 }
 
-function upload(){
-  if(currentUser!=="admin")return;
+/* ADMIN UPLOAD */
+function uploadContent(){
+  if(currentUser!=="admin"){ alert("Admin only"); return; }
 
-  const img=image.files[0];
-  if(!img || !img.type.startsWith("image/")){
+  const item={
+    title:titleInput.value,
+    course:courseSelect.value,
+    year:yearSelect.value,
+    semester:semesterSelect.value,
+    type:uploadType.value,
+    img:null
+  };
+
+  if(!item.title||!item.course||!item.semester||!imageInput.files[0]){
+    alert("Fill all fields");
+    return;
+  }
+
+  const file=imageInput.files[0];
+  if(!file.type.startsWith("image/")){
     alert("Only images allowed");
     return;
   }
 
   const reader=new FileReader();
-  reader.onload=e=>{
-    const item={
-      title:title.value,
-      course:course.value,
-      year:year.value,
-      img:e.target.result
-    };
+  reader.onload=()=>{
+    item.img=reader.result;
+    if(item.type==="paper"){ papers.push(item); filterPapers(); }
+    else{ materials.push(item); filterMaterials(); }
 
-    if(uploadType.value==="paper"){
-      papers.push(item); filterPapers();
-    }else{
-      materials.push(item); filterMaterials();
-    }
+    alert("Uploaded ✅");
+    titleInput.value=courseSelect.value=yearSelect.value=semesterSelect.value=imageInput.value="";
   };
-  reader.readAsDataURL(img);
+  reader.readAsDataURL(file);
 }
 
+/* RENDER */
 function render(list,container){
   container.innerHTML="";
   list.forEach(i=>{
     container.innerHTML+=`
-      <div class="bg-white p-2 rounded shadow">
-        <img src="${i.img}" class="w-full h-40 object-cover rounded mb-2">
-        <p class="font-semibold">${i.title}</p>
-      </div>`;
+    <div class="bg-white p-2 rounded shadow">
+      <img src="${i.img}" class="w-full h-40 object-cover rounded mb-2">
+      <p class="font-semibold">${i.title}</p>
+      <p class="text-sm text-gray-500">${i.course} | Sem ${i.semester} ${i.year||""}</p>
+    </div>`;
   });
 }
 
+/* FILTERS */
 function filterPapers(){
   render(
     papers.filter(p=>
       (!paperCourse.value||p.course===paperCourse.value)&&
-      (!paperYear.value||p.year===paperYear.value)
+      (!paperYear.value||p.year===paperYear.value)&&
+      (!paperSemester.value||p.semester===paperSemester.value)
     ),
     paperList
   );
@@ -225,21 +258,22 @@ function filterPapers(){
 function filterMaterials(){
   render(
     materials.filter(m=>
-      !materialCourse.value||m.course===materialCourse.value
+      (!materialCourse.value||m.course===materialCourse.value)&&
+      (!materialSemester.value||m.semester===materialSemester.value)
     ),
     materialList
   );
 }
 
+/* ADMIN SHORTCUT */
 function checkAdmin(){
   if(adminPass.value===ADMIN_PASS){
     currentUser="admin";
     adminTab.classList.remove("hidden");
     adminLogin.classList.add("hidden");
-    alert("Admin Access Granted");
-  }else alert("Wrong password");
+    showTab("admin");
+  } else alert("Wrong password");
 }
-
 document.addEventListener("keydown",e=>{
   if(e.ctrlKey&&e.shiftKey&&e.key==="A"){
     adminLogin.classList.remove("hidden");
